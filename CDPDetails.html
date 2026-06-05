@@ -1,0 +1,626 @@
+# Enterprise Customer Data Platform (CDP)
+
+## Architecture, Design Decisions, and Interview Handbook
+
+**Author:** Shashi Yadav
+**Version:** 1.0
+
+---
+
+# Executive Summary
+
+The Customer Data Platform (CDP) is an enterprise-wide customer data management platform designed to create a Single Customer View across all insurance journeys.
+
+The platform consolidates customer information from multiple source systems and maintains:
+
+* Prospect Profiles
+* Golden Customer Profiles
+* Customer Journey Data
+* Customer 360 Views
+
+The solution uses a hybrid architecture combining:
+
+* Real-Time Processing (Azure Event Hub + Azure Functions)
+* Batch Processing (Spring Batch + SQL Server)
+
+This architecture supports both modern event-driven systems and legacy systems.
+
+---
+
+# Business Problem
+
+Before CDP implementation:
+
+* Customer information was distributed across multiple systems.
+* Duplicate customer records existed.
+* No unified customer identity.
+* Difficult to perform customer analytics.
+* No centralized Customer 360 capability.
+* Marketing and servicing teams had fragmented customer visibility.
+
+The CDP addresses these challenges by creating a centralized customer repository.
+
+---
+
+# Business Objectives
+
+Primary objectives:
+
+* Customer 360
+* Single Source of Truth
+* Identity Resolution
+* Journey Tracking
+* Customer Analytics
+* Personalization
+* Cross-Sell and Upsell
+* Regulatory Reporting
+
+---
+
+# High-Level Architecture
+
+## Source Systems
+
+* Health Insurance
+* Travel Insurance
+* Motor Insurance
+* Term Insurance
+* CRM
+* Mobile App
+* Web Portal
+* Partner Systems
+
+### Ingestion Layer
+
+**Real-Time**
+
+* Azure Event Hub
+* Azure Functions
+
+**Batch**
+
+* Spring Batch
+* Stored Procedures
+
+### Identity Resolution Layer
+
+### Customer Profiles
+
+* Prospect Profile
+* Golden Profile
+
+### Customer 360 APIs
+
+### Consumers
+
+* CRM
+* Marketing
+* Analytics
+* Customer Service
+
+---
+
+# Real-Time Processing Architecture
+
+## Business Events
+
+Examples:
+
+* Quote Created
+* Proposal Submitted
+* KYC Completed
+* Payment Success
+* Policy Issued
+* Customer Login
+
+## Processing Flow
+
+Application
+
+↓
+Azure Event Hub
+
+↓
+Azure Functions
+
+↓
+Validation
+
+↓
+Identity Resolution
+
+↓
+CDP Database
+
+### Benefits
+
+* Near real-time updates
+* Immediate customer visibility
+* Event-driven architecture
+
+---
+
+# Azure Components
+
+## Azure Event Hub
+
+### Purpose
+
+Enterprise event ingestion platform.
+
+### Responsibilities
+
+* Event streaming
+* Partition management
+* Event retention
+* High throughput
+
+### Comparable To
+
+Kafka as a managed Azure service.
+
+---
+
+## Azure Functions
+
+### Purpose
+
+Serverless event processing.
+
+### Responsibilities
+
+* Event validation
+* Transformation
+* Customer matching
+* Journey updates
+
+### Benefits
+
+* Auto scaling
+* No infrastructure management
+
+---
+
+## Azure Storage Account
+
+Used for:
+
+* Raw event storage
+* Replay support
+* Audit requirements
+
+---
+
+## Azure Key Vault
+
+Stores:
+
+* Secrets
+* API Keys
+* Database Credentials
+
+---
+
+## Azure Monitor
+
+Provides:
+
+* Operational monitoring
+* Alerting
+* Metrics
+
+---
+
+## Application Insights
+
+Provides:
+
+* Tracing
+* Dependency monitoring
+* Exception tracking
+
+---
+
+# Batch Processing Architecture
+
+Batch jobs synchronize:
+
+* Quotes
+* Proposals
+* Members
+* KYC
+* Payments
+* Policies
+
+## Flow
+
+Stored Procedure
+
+↓
+Reader
+
+↓
+Processor
+
+↓
+Writer
+
+↓
+CDP Database
+
+### Framework
+
+Spring Batch
+
+### Features
+
+* Restartability
+* Chunk Processing
+* Parallel Execution
+* Audit Logging
+
+---
+
+# Identity Resolution Engine
+
+Most critical CDP component.
+
+### Matching Hierarchy
+
+1. Customer ID
+2. PAN
+3. Mobile
+4. Email
+5. Composite Rules
+
+### Purpose
+
+Identify whether incoming data belongs to:
+
+* Existing Customer
+* Existing Prospect
+* New Customer
+
+---
+
+# Prospect Profile
+
+Represents a potential customer before policy issuance.
+
+### Contains
+
+* Contact Information
+* Demographics
+* Quote History
+* Proposal History
+* Journey Participation
+
+---
+
+# Golden Customer Profile
+
+Represents enterprise customer identity.
+
+### Contains
+
+* Customer ID
+* Master Contact Details
+* Customer Preferences
+* Products Owned
+* Relationships
+
+### Purpose
+
+Single Source of Truth.
+
+---
+
+# Customer Journey Model
+
+Quote
+
+↓
+Proposal
+
+↓
+KYC
+
+↓
+Payment
+
+↓
+Policy
+
+### Benefits
+
+* Funnel Analysis
+* Drop-off Analysis
+* Conversion Tracking
+
+---
+
+# Customer 360 View
+
+Provides:
+
+* Profile
+* Quotes
+* Proposals
+* KYC
+* Payments
+* Policies
+* Interaction History
+
+### API
+
+GET /customer/{customerId}/360
+
+---
+
+# Data Model
+
+## Core Entities
+
+* ProspectProfile
+* GoldenProfile
+* CustomerRelationship
+* CustomerContact
+
+## Journey Entities
+
+* QuoteData
+* ProposalData
+* MemberData
+* KYCData
+* PaymentData
+* PolicyData
+
+## Reference Data
+
+* ProductMaster
+* LOBMaster
+* ChannelMaster
+* OperatorMaster
+
+---
+
+# API Strategy
+
+## Profile APIs
+
+* GET /profiles/{id}
+* GET /profiles/search
+* GET /profiles/customer/{customerId}
+
+## Journey APIs
+
+* GET /quotes
+* GET /proposals
+* GET /payments
+* GET /kyc
+
+## Customer APIs
+
+* GET /customer/{customerId}/360
+* GET /customer/{customerId}/timeline
+
+---
+
+# Security Architecture
+
+## Authentication
+
+OAuth2
+
+## Authorization
+
+Role-Based Access Control (RBAC)
+
+## Encryption
+
+TLS
+
+## PII Protection
+
+* PAN
+* Email
+* Mobile
+
+Audit Logging enabled.
+
+---
+
+# Monitoring & Observability
+
+## Tools
+
+* Azure Monitor
+* Application Insights
+* SQL Monitoring
+* Spring Batch Monitoring
+
+## Metrics
+
+* Event Throughput
+* Processing Latency
+* Failed Events
+* Batch Job Success Rate
+* API Response Time
+
+---
+
+# Scalability Strategy
+
+## Real-Time
+
+Event Hub Partitions
+
+↓
+Multiple Function Instances
+
+## Batch
+
+Spring Batch Partitioning
+
+↓
+Parallel Workers
+
+## Database
+
+* Index Optimization
+* Partitioned Tables
+* Read Replicas
+
+---
+
+# Architecture Decisions & Trade-Offs
+
+## Why Event Hub Instead of Kafka?
+
+Event Hub chosen because:
+
+* Azure Native
+* Fully Managed
+* Lower Operational Cost
+* Easier Monitoring
+
+Kafka would be preferable in multi-cloud environments.
+
+---
+
+## Why Batch and Real-Time Together?
+
+### Real-Time
+
+* Customer interactions
+* Payments
+* Quotes
+
+### Batch
+
+* Legacy systems
+* Historical loads
+
+Hybrid architecture ensures complete coverage.
+
+---
+
+## Why SQL Server Instead of NoSQL?
+
+Insurance data is highly relational.
+
+Requirements:
+
+* ACID Transactions
+* Reporting
+* Referential Integrity
+
+SQL Server provides better support.
+
+---
+
+## Why Golden Profile?
+
+Without Golden Profile:
+
+* Duplicate Customers
+* Inconsistent Reporting
+* Poor Analytics
+
+Golden Profile creates a Single Source of Truth.
+
+---
+
+## Why Spring Batch Instead of Data Factory?
+
+Advantages:
+
+* Complex business logic
+* Better Java integration
+* Fine-grained control
+* Restartability
+
+---
+
+## Why API Access Instead of Direct Database Access?
+
+Benefits:
+
+* Security
+* Governance
+* Versioning
+* Scalability
+* Encapsulation
+
+### Principle
+
+Source Systems Own Data
+
+CDP Owns Customer View
+
+---
+
+# Architecture Interview Questions & Answers
+
+Key Topics:
+
+* Event Hub vs Kafka
+* Azure Functions
+* Idempotency
+* Duplicate Prevention
+* Event Ordering
+* Event Replay
+* Golden Profile Creation
+* Mobile Number Changes
+* Data Merging
+* Customer 360
+* Prospect vs Golden Profile
+* Hybrid Architecture
+* Consistency Management
+* Scalability
+* Monitoring
+* Security
+* Identity Resolution Challenges
+* Future Enhancements
+
+---
+
+# Future Roadmap
+
+## Phase 1
+
+Prospect Consolidation
+
+## Phase 2
+
+Golden Profile
+
+## Phase 3
+
+Customer 360 APIs
+
+## Phase 4
+
+CDC Integration
+
+## Phase 5
+
+Real-Time Profile Updates
+
+## Phase 6
+
+AI Identity Resolution
+
+## Phase 7
+
+Next Best Action Engine
+
+## Phase 8
+
+Customer Segmentation Engine
+
+---
+
+# Interview Closing Statement
+
+"Our CDP is a hybrid architecture that combines Azure Event Hub and Azure Functions for real-time customer events with Spring Batch ETL processing for legacy and bulk data synchronization. The platform performs identity resolution, builds Prospect and Golden Customer Profiles, tracks complete customer journeys, and exposes Customer 360 APIs. The objective is to create a trusted enterprise customer repository that supports analytics, personalization, operational systems, and future AI-driven customer engagement."
